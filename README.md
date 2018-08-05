@@ -11,7 +11,7 @@
   
   After application is started go to http://localhost:8080/validator. You should see something like this:
   
-  ![Main view](https://github.com/LMskvtsv/TradeValidator/tree/master/src/main/resources/images/mainView.png)
+  ![Main view](mainView.png)
   
   
   To paste test data, just press the "Paste json with tests" button.
