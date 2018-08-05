@@ -29,14 +29,23 @@ public class ValidationService {
         int counter = 1;
         final Map<Integer, CheckResponse> responses = new HashMap<>();
         if (trades != null) {
-            for (Trade trade : trades.getTests()) {
-                logger.info("Check trade: " + trade);
+            if(trades.getTests().size() == 0){
+                String message = "There is no trades in 'tests' array. Please, check the name of trades array or add trades into array.";
+                logger.error(message);
                 CheckResponse response = new CheckResponse();
-                response.setStatusCode(StatusCode.SUCCESS);
-                response.setTrade(trade);
-                trade.setId(counter++);
-                for (Checker checker : Checkers.getCheckers()) {
-                    responses.put(trade.getId(), checker.check(trade, response));
+                response.setStatusCode(StatusCode.ERROR);
+                response.addMessage(message);
+                responses.put(0, response);
+            } else {
+                for (Trade trade : trades.getTests()) {
+                    logger.info("Check trade: " + trade);
+                    CheckResponse response = new CheckResponse();
+                    response.setStatusCode(StatusCode.SUCCESS);
+                    response.setTrade(trade);
+                    trade.setId(counter++);
+                    for (Checker checker : Checkers.getCheckers()) {
+                        responses.put(trade.getId(), checker.check(trade, response));
+                    }
                 }
             }
         } else {

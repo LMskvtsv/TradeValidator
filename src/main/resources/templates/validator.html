@@ -30,6 +30,7 @@
         <button id="submit" type="button" class="btn btn-primary">Validate!</button>
         <button id="shutDown" type="button" class="btn btn-danger">Shutdown!</button>
     </form>
+    <br>
 </div>
 <div id="message" class="container">
 </div>
@@ -103,7 +104,12 @@
                 }
                 rows += '</td>';
                 const trade = JSON.stringify(data[key].trade);
-                rows += '<td>' + trade + '</td></tr>';
+                console.log(trade);
+                if (trade === 'null'){
+                    rows += '<td></td></tr>';
+                } else {
+                    rows += '<td>' + trade + '</td></tr>';
+                }
             }
 
             document.getElementById("body-items").innerHTML = rows;
