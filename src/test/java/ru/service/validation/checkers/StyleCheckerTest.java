@@ -97,4 +97,17 @@ public class StyleCheckerTest {
         assertThat(resp.getStatusCode(), is(StatusCode.SUCCESS));
         assertThat(resp.getMessages().size(), is(0));
     }
+
+    @Test
+    public void whenTypeIsNotSupportedThenError() {
+        Trade trade = new Trade();
+        trade.setType("Fake_type");
+        trade.setStyle(OptionStyle.AMERICAN.name());
+        CheckResponse resp = new CheckResponse();
+        resp.setStatusCode(StatusCode.SUCCESS);
+        resp = CHECKER.check(trade, resp);
+        assertThat(resp.getStatusCode(), is(StatusCode.ERROR));
+        assertThat(resp.getMessages().contains("Instrument type 'Fake_type' is not supported by system."), is(true));
+        assertThat(resp.getMessages().size(), is(1));
+    }
 }

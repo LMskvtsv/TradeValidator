@@ -30,7 +30,7 @@ public class ValidationService {
         final Map<Integer, CheckResponse> responses = new HashMap<>();
         if (trades != null) {
             if (trades.getTests().size() == 0) {
-                String message = "There is no trades in 'tests' array. Please, check the name of trades array or add trades into array.";
+                String message = "There are no trades in 'tests' array. Please, check the name of trades array or add trades into array.";
                 logger.error(message);
                 CheckResponse response = new CheckResponse();
                 response.setStatusCode(StatusCode.ERROR);

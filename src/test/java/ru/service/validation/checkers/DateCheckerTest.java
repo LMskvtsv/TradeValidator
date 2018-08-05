@@ -10,7 +10,6 @@ import ru.service.messages.CheckResponse;
 import ru.service.utils.ErrorMassages;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -19,10 +18,12 @@ import static org.junit.Assert.assertThat;
 public class DateCheckerTest {
 
     private static final DateChecker CHECKER = new DateChecker();
+    private static final Calendar DATE = Calendar.getInstance();
 
     @BeforeClass
     public static void init() {
         CHECKER.init();
+        DATE.set(2018, Calendar.AUGUST, 05);
     }
 
     @Test
@@ -47,7 +48,7 @@ public class DateCheckerTest {
         Trade trade = new Trade();
         CheckResponse resp = new CheckResponse();
         trade.setType(InstrumentType.VANILLAOPTION.name());
-        trade.setTradeDate(new Date());
+        trade.setTradeDate(DATE.getTime());
         resp = CHECKER.check(trade, resp);
         assertThat(resp.getStatusCode(), is(StatusCode.ERROR));
         assertThat(resp.getMessages().contains(ErrorMassages.EMPTY_VALUE_DATE), is(true));
@@ -63,7 +64,7 @@ public class DateCheckerTest {
         Trade trade = new Trade();
         CheckResponse resp = new CheckResponse();
         trade.setType(InstrumentType.VANILLAOPTION.name());
-        trade.setTradeDate(new Date());
+        trade.setTradeDate(DATE.getTime());
         Calendar calendar = Calendar.getInstance();
         calendar.set(2018, Calendar.AUGUST, 14);
         trade.setValueDate(calendar.getTime());
@@ -81,12 +82,12 @@ public class DateCheckerTest {
         Trade trade = new Trade();
         CheckResponse resp = new CheckResponse();
         trade.setType(InstrumentType.VANILLAOPTION.name());
-        trade.setTradeDate(new Date());
-        trade.setDeliveryDate(new Date());
+        trade.setTradeDate(DATE.getTime());
+        trade.setDeliveryDate(DATE.getTime());
         Calendar calendar = Calendar.getInstance();
         calendar.set(2018, Calendar.AUGUST, 14);
         trade.setValueDate(calendar.getTime());
-        trade.setExcerciseStartDate(new Date());
+        trade.setExcerciseStartDate(DATE.getTime());
         resp = CHECKER.check(trade, resp);
         assertThat(resp.getStatusCode(), is(StatusCode.ERROR));
         assertThat(resp.getMessages().contains(ErrorMassages.EMPTY_STYLE), is(true));
@@ -100,13 +101,13 @@ public class DateCheckerTest {
         Trade trade = new Trade();
         CheckResponse resp = new CheckResponse();
         trade.setType(InstrumentType.VANILLAOPTION.name());
-        trade.setTradeDate(new Date());
-        trade.setDeliveryDate(new Date());
+        trade.setTradeDate(DATE.getTime());
+        trade.setDeliveryDate(DATE.getTime());
         Calendar calendar = Calendar.getInstance();
         calendar.set(2018, Calendar.AUGUST, 14);
         trade.setValueDate(calendar.getTime());
-        trade.setExcerciseStartDate(new Date());
-        trade.setExpiryDate(new Date());
+        trade.setExcerciseStartDate(DATE.getTime());
+        trade.setExpiryDate(DATE.getTime());
         resp = CHECKER.check(trade, resp);
         assertThat(resp.getStatusCode(), is(StatusCode.ERROR));
         assertThat(resp.getMessages().contains(ErrorMassages.EMPTY_STYLE), is(true));
@@ -116,16 +117,18 @@ public class DateCheckerTest {
 
     @Test
     public void whenDeliveryDateMissingThenError() {
+        Calendar date = Calendar.getInstance();
+        date.set(2018, Calendar.AUGUST, 05);
         Trade trade = new Trade();
         CheckResponse resp = new CheckResponse();
         trade.setType(InstrumentType.VANILLAOPTION.name());
-        trade.setTradeDate(new Date());
+        trade.setTradeDate(date.getTime());
         Calendar calendar = Calendar.getInstance();
         calendar.set(2018, Calendar.AUGUST, 14);
         trade.setValueDate(calendar.getTime());
-        trade.setExcerciseStartDate(new Date());
-        trade.setExpiryDate(new Date());
-        trade.setPremiumDate(new Date());
+        trade.setExcerciseStartDate(date.getTime());
+        trade.setExpiryDate(date.getTime());
+        trade.setPremiumDate(date.getTime());
         resp = CHECKER.check(trade, resp);
         assertThat(resp.getStatusCode(), is(StatusCode.ERROR));
         assertThat(resp.getMessages().contains(ErrorMassages.EMPTY_STYLE), is(true));
@@ -470,6 +473,43 @@ public class DateCheckerTest {
         resp = CHECKER.check(trade, resp);
         assertThat(resp.getStatusCode(), is(StatusCode.ERROR));
         assertThat(resp.getMessages().contains("'Exercise Start Date' has to be after the 'Trade date' but before the 'Expiry date'."), is(true));
+        assertThat(resp.getMessages().size(), is(1));
+    }
+
+    @Test
+    public void whenTypeMissingThenError() {
+        Trade trade = new Trade();
+        trade.setStyle(OptionStyle.AMERICAN.name());
+        CheckResponse resp = new CheckResponse();
+
+        Calendar tradeDate = Calendar.getInstance();
+        tradeDate.set(2018, Calendar.AUGUST, 02);
+        trade.setTradeDate(tradeDate.getTime());
+
+        Calendar valueDate = Calendar.getInstance();
+        valueDate.set(2018, Calendar.AUGUST, 14);
+        trade.setValueDate(valueDate.getTime());
+
+        Calendar exersiceDate = Calendar.getInstance();
+        exersiceDate.set(2018, Calendar.AUGUST, 01);
+        trade.setExcerciseStartDate(exersiceDate.getTime());
+
+        Calendar deliveryDate = Calendar.getInstance();
+        deliveryDate.set(2018, Calendar.AUGUST, 10);
+        trade.setDeliveryDate(deliveryDate.getTime());
+
+        Calendar expDate = Calendar.getInstance();
+        expDate.set(2018, Calendar.AUGUST, 06);
+        trade.setExpiryDate(expDate.getTime());
+
+        Calendar premiumDate = Calendar.getInstance();
+        premiumDate.set(2018, Calendar.AUGUST, 01);
+        trade.setPremiumDate(premiumDate.getTime());
+
+        resp.setStatusCode(StatusCode.SUCCESS);
+        resp = CHECKER.check(trade, resp);
+        assertThat(resp.getStatusCode(), is(StatusCode.ERROR));
+        assertThat(resp.getMessages().contains("Instrument type is missing."), is(true));
         assertThat(resp.getMessages().size(), is(1));
     }
 }
